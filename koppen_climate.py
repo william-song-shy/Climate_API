@@ -198,6 +198,13 @@ class Place:
     def __repr__(self):
         return "({},{},{})".format(self.__latitude,self.__longitude,self.__elevation)
 
+    def get_lat (self):
+        return self.__latitude
+    def get_lon (self):
+        return self.__longitude
+    def get_ele (self):
+        return self.__elevation
+
 class Station:
     def __init__ (self):
         pass
