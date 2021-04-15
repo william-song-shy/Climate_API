@@ -174,6 +174,9 @@ class ClimateData:
             else:
                 climate  = 'EF'
 
+    def get_data (self):
+        return self.__data
+
 class Place:
     def __init__(self,latitude,longitude,elevation):
         self.__latitude=latitude
