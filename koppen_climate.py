@@ -198,6 +198,16 @@ class Place:
             ans.append(temp)
         return ans
 
+    def get_country (self):
+        data=requests.get(
+            "https://nominatim.openstreetmap.org/reverse?format=json&lat={}&lon={}&zom=18&addressdetails=1".format(
+                self.__latitude,self.__longitude
+            )
+        ).json()
+        if data.get('error'):
+            return None
+        return data.get('address').get('country_code')
+
     def __repr__(self):
         return "({},{},{})".format(self.__latitude,self.__longitude,self.__elevation)
 
