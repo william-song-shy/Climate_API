@@ -194,10 +194,6 @@ class ClimateData:
                 climate = 'EF'
 
     def get_data(self):
-        """
-        Get the data
-        :return: the data
-        """
         return self.__data
 
 
@@ -242,6 +238,10 @@ class Place:
         return ans
 
     def get_country(self):
+        """
+        Get the country of the place
+        :return: Alpha-2 code of the country (ISO 3166)
+        """
         data = requests.get(
             "https://nominatim.openstreetmap.org/reverse?format=json&lat={}&lon={}&zom=18&addressdetails=1".format(
                 self.__latitude, self.__longitude
@@ -269,16 +269,30 @@ class Station:
         pass
 
     def set_by_data(self, data):
+        """
+        Set the station with data
+        :param data: the data
+        :return: noting
+        """
         self.__id = data['id']
         self.__name = data['name'].get('en')
         self.__country = data['country']
         self.__place = Place(float(data["latitude"]), float(data["longitude"]), int(data["elevation"]))  # 经度纬度海拔
 
     def set_by_id(self, ida):
+        """
+        Set the station by meteostat id
+        :param ida: meteostat id
+        :return: noting
+        """
         data = get_to_json("https://api.meteostat.net/v2/stations/meta?id={}".format(ida))['data']
         self.set_by_data(data)
 
     def get_climate_data(self):
+        """
+        Get the climate data
+        :return: the climate data in ClimateData class
+        """
         data = get_to_json("https://api.meteostat.net/v2/stations/climate", params={"station": self.__id})
         return ClimateData(data['data'])
 
@@ -296,6 +310,13 @@ class Station:
 
 
 def search_station(query, length=10):
+    """
+    Search station by the name
+    :param query: the name
+    :param length: the length
+    :return: a list of class Station
+    """
+    # todo : fix the bug of return 401
     data = get_to_json("https://api.meteostat.net/v2/stations/search",
                        params={"query": query, 'limit': length})['data']
     ans = list()
