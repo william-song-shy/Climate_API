@@ -3,14 +3,30 @@ import requests
 
 
 def get_to_json(url, params={}):
+    """
+    A function to get a url which return a json and decode it into dict
+    :param url: The url use to get
+    :param params: params
+    :return: the json response in dict
+    """
     return requests.get(url, headers={"x-api-key": "cEghsfXW7CG5W43dEzrvhjn3a8mZjkYm"}, params=params).json()
 
 
 class ClimateData:
+    """A class of climate data
+    """
     def __init__(self, data):
+        """
+        A function to init the class
+        :param data:the data of the climate
+        """
         self.__data = data
 
     def get_koppen(self):
+        """Get the climate type
+
+        :return: the köppen type of the climate(i.e. Cfa,Af .etc).
+        """
         data = self.__data
         avgtemp = list()
         precip = list()
@@ -178,21 +194,41 @@ class ClimateData:
                 climate = 'EF'
 
     def get_data(self):
+        """
+        Get the data
+        :return: the data
+        """
         return self.__data
 
 
 class Place:
+    """
+    A class of a place/point
+    """
     def __init__(self, latitude, longitude, elevation):
+        """
+        Init the class
+        :param latitude: the latitude of the place
+        :param longitude: the longitude of the place
+        :param elevation: the elevation of the place
+        """
         self.__latitude = latitude
         self.__longitude = longitude
         self.__elevation = elevation
 
     def get_climate_data(self):  # 千万不要对Station导出的Place执行这个操作
+        """
+        A function to get the climate data
+        :return: the climate data in ClimateData class
+        """
         data = get_to_json("https://api.meteostat.net/v2/point/climate", params=
         {"lat": self.__latitude, "lon": self.__longitude, "alt": self.__elevation})['data']
         return ClimateData(data)
 
-    def get_nearby_staions(self, length=5):
+    def get_nearby_stations(self):
+        """The function to get nearby stations
+        :return: the list of nearby stations in Station class
+        """
         data = get_to_json("https://api.meteostat.net/v2/stations/nearby",
                            params={"lat": self.__latitude, "lon": self.__longitude})['data']
         ans = list()

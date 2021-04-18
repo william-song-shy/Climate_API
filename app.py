@@ -168,7 +168,7 @@ def PointClimate(data):
         'ET': "苔原",
         'EF': "冰原"
     }
-    ns = p.get_nearby_staions()
+    ns = p.get_nearby_stations()
     nsl = list()
     if ns:
         for i in ns:
