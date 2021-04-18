@@ -31,6 +31,16 @@ class StationandClimateOut(Schema):
     koppentype = String()
     chinesetype = String()
 
+class PointIn (Schema):
+    lat=Float(required=True,validate=Range(-90,90))
+    lon=Float(required=True,validate=Range(-180,180))
+
+class PointandClimateOut(Schema):
+    country = String()
+    data = List(Dict())
+    koppentype = String()
+    chinesetype = String()
+
 @app.get('/')
 def main ():
     """Show some imformation
@@ -75,7 +85,7 @@ def StationClimate(data):
         'Am': "热带季风",
         'Aw': "热带草原",
         'BWk': "温带干旱",
-        'Bwh': "热带沙漠",
+        'BWh': "热带沙漠",
         'BSh': "热带半干旱",
         'BSk': "温带半干旱",
         'Csa': "地中海气候",
@@ -108,6 +118,50 @@ def StationClimate(data):
         'lat': station.get_place().get_lat(),
         'lon': station.get_place().get_lon(),
         'data': station.get_climate_data().get_data(),
+        'koppentype': climatetype,
+        'chinesetype': koppen2chinese.get(climatetype)
+    }
+
+@app.get('/point/climate')
+@input(PointIn,location="query")
+@output(PointandClimateOut)
+def PointClimate (data):
+    p=Place(data['lat'],data['lon'],0)
+    climatetype=p.get_climate_data().get_koppen()
+    koppen2chinese = {
+        'Af': "热带雨林",
+        'Am': "热带季风",
+        'Aw': "热带草原",
+        'BWk': "温带干旱",
+        'BWh': "热带沙漠",
+        'BSh': "热带半干旱",
+        'BSk': "温带半干旱",
+        'Csa': "地中海气候",
+        'Csb': "地中海气候",
+        'Csc': "地中海气候",
+        'Cfa': "亚热带湿润气候",
+        'Cwa': "亚热带湿润气候",
+        'Cwb': "温带海洋",
+        'Cfb': "温带海洋",
+        'Cfc': "温带海洋",
+        'Dsa': "温带大陆",
+        'Dsb': "温带大陆",
+        'Dsc': "亚寒带",
+        'Dsd': "亚寒带",
+        'Dwa': "温带大陆性湿润",
+        'Dwb': "温带大陆性湿润",
+        'Dwc': "亚寒带",
+        'Dwd': "亚寒带",
+        'Dfa': "温带大陆性湿润",
+        'Dfb': "温带大陆性湿润",
+        'Dfc': "亚寒带",
+        'Dfd': "亚寒带",
+        'ET': "苔原",
+        'EF': "冰原"
+    }
+    return {
+        'country':p.get_country(),
+        'data':p.get_climate_data().get_data(),
         'koppentype': climatetype,
         'chinesetype': koppen2chinese.get(climatetype)
     }
