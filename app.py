@@ -1,25 +1,27 @@
-from apiflask import APIFlask,Schema,input, output
-from apiflask.fields import String,Integer,Float,Dict,List
-from apiflask.validators import Length,Range
+from apiflask import APIFlask, Schema, input, output
+from apiflask.fields import String, Integer, Float, Dict, List
+from apiflask.validators import Length, Range
 from koppen_climate import *
 
 app = APIFlask(__name__)
 
-class StationOut (Schema):
-    id=String()
-    name=String()
-    country=String()
-    lat=Float()
-    lon=Float()
+
+class StationOut(Schema):
+    id = String()
+    name = String()
+    country = String()
+    lat = Float()
+    lon = Float()
 
 
+class StationFindIn(Schema):
+    name = String(required=True, validate=Length(1, 75))
+    length = Integer(required=False, missing=10, validate=Range(2, 15))
 
-class StationFindIn (Schema):
-    name = String (required=True,validate=Length(1,75))
-    length=Integer(required=False,missing=10,validate=Range(2,15))
 
-class StationIn (Schema):
-    id=String(required=True)
+class StationIn(Schema):
+    id = String(required=True)
+
 
 class StationandClimateOut(Schema):
     id = String()
@@ -31,9 +33,11 @@ class StationandClimateOut(Schema):
     koppentype = String()
     chinesetype = String()
 
-class PointIn (Schema):
-    lat=Float(required=True,validate=Range(-90,90))
-    lon=Float(required=True,validate=Range(-180,180))
+
+class PointIn(Schema):
+    lat = Float(required=True, validate=Range(-90, 90))
+    lon = Float(required=True, validate=Range(-180, 180))
+
 
 class PointandClimateOut(Schema):
     country = String()
@@ -41,15 +45,17 @@ class PointandClimateOut(Schema):
     koppentype = String()
     chinesetype = String()
 
+
 @app.get('/')
-def main ():
+def main():
     """Show some imformation
 
     """
-    return {"about":"See /redoc to see how to use this API"}
+    return {"about": "See /redoc to see how to use this API"}
+
 
 @app.get('/station/find')
-@input(StationFindIn,location="query")
+@input(StationFindIn, location="query")
 @output(StationOut(many=True))
 def FindStation(data):
     """Find a station by name
@@ -57,30 +63,31 @@ def FindStation(data):
     the meteostat will return 400 if the name is too short to search<br>
     this API will return the id(in meteostat),name,country(ISO 3166-1 alpha-2) and latlon data
     """
-    data=search_station(query=data['name'],length=data['length'])
-    l=list()
+    data = search_station(query=data['name'], length=data['length'])
+    l = list()
     for i in data:
         l.append(
             {
-                'id':i.get_id(),
-                'name':i.get_name(),
-                'country':i.get_country(),
-                'lat':i.get_place().get_lat(),
-                'lon':i.get_place().get_lon()
+                'id': i.get_id(),
+                'name': i.get_name(),
+                'country': i.get_country(),
+                'lat': i.get_place().get_lat(),
+                'lon': i.get_place().get_lon()
             })
     return l
 
+
 @app.get('/station/climate')
-@input(StationIn,location="query")
+@input(StationIn, location="query")
 @output(StationandClimateOut)
 def StationClimate(data):
     """Get the climate data
 
     """
-    station=Station()
+    station = Station()
     station.set_by_id(data['id'])
-    climatetype=station.get_climate_data().get_koppen()
-    koppen2chinese={
+    climatetype = station.get_climate_data().get_koppen()
+    koppen2chinese = {
         'Af': "热带雨林",
         'Am': "热带季风",
         'Aw': "热带草原",
@@ -122,12 +129,13 @@ def StationClimate(data):
         'chinesetype': koppen2chinese.get(climatetype)
     }
 
+
 @app.get('/point/climate')
-@input(PointIn,location="query")
+@input(PointIn, location="query")
 @output(PointandClimateOut)
-def PointClimate (data):
-    p=Place(data['lat'],data['lon'],0)
-    climatetype=p.get_climate_data().get_koppen()
+def PointClimate(data):
+    p = Place(data['lat'], data['lon'], 0)
+    climatetype = p.get_climate_data().get_koppen()
     koppen2chinese = {
         'Af': "热带雨林",
         'Am': "热带季风",
@@ -160,8 +168,8 @@ def PointClimate (data):
         'EF': "冰原"
     }
     return {
-        'country':p.get_country(),
-        'data':p.get_climate_data().get_data(),
+        'country': p.get_country(),
+        'data': p.get_climate_data().get_data(),
         'koppentype': climatetype,
         'chinesetype': koppen2chinese.get(climatetype)
     }
