@@ -41,6 +41,7 @@ class PointIn(Schema):
 
 class PointandClimateOut(Schema):
     country = String()
+    nearby_stations = List(Dict())
     data = List(Dict())
     koppentype = String()
     chinesetype = String()
@@ -167,8 +168,15 @@ def PointClimate(data):
         'ET': "苔原",
         'EF': "冰原"
     }
+    ns = p.get_nearby_staions()
+    nsl = list()
+    if ns:
+        for i in ns:
+            nsl.append({'id': i.get_id(), 'country': i.get_country(), 'lat': i.get_place().get_lat(),
+                        'lon': i.get_place().get_lon(), 'name': i.get_name()})
     return {
         'country': p.get_country(),
+        'nearby_stations': nsl,
         'data': p.get_climate_data().get_data(),
         'koppentype': climatetype,
         'chinesetype': koppen2chinese.get(climatetype)

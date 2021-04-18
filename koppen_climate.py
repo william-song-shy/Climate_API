@@ -196,6 +196,8 @@ class Place:
         data = get_to_json("https://api.meteostat.net/v2/stations/nearby",
                            params={"lat": self.__latitude, "lon": self.__longitude})['data']
         ans = list()
+        if not data:
+            return None
         for i in data:
             id = i['id']
             temp = Station()
