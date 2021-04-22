@@ -75,7 +75,7 @@ def FindStation(data):
                 'lat': i.get_place().get_lat(),
                 'lon': i.get_place().get_lon()
             })
-    return l
+    return l, {'Access-Control-Allow-Origin': '*'}
 
 
 @app.get('/station/climate')
@@ -121,15 +121,15 @@ def StationClimate(data):
         'EF': "冰原"
     }
     return {
-        'id': station.get_id(),
-        'name': station.get_name(),
-        'country': station.get_country(),
-        'lat': station.get_place().get_lat(),
-        'lon': station.get_place().get_lon(),
-        'data': station.get_climate_data().get_data(),
-        'koppentype': climatetype,
-        'chinesetype': koppen2chinese.get(climatetype)
-    }
+               'id': station.get_id(),
+               'name': station.get_name(),
+               'country': station.get_country(),
+               'lat': station.get_place().get_lat(),
+               'lon': station.get_place().get_lon(),
+               'data': station.get_climate_data().get_data(),
+               'koppentype': climatetype,
+               'chinesetype': koppen2chinese.get(climatetype)
+           }, {'Access-Control-Allow-Origin': '*'}
 
 
 @app.get('/point/climate')
@@ -177,9 +177,9 @@ def PointClimate(data):
             nsl.append({'id': i.get_id(), 'country': i.get_country(), 'lat': i.get_place().get_lat(),
                         'lon': i.get_place().get_lon(), 'name': i.get_name()})
     return {
-        'country': p.get_country(),
-        'nearby_stations': nsl,
-        'data': p.get_climate_data().get_data(),
-        'koppentype': climatetype,
-        'chinesetype': koppen2chinese.get(climatetype)
-    }
+               'country': p.get_country(),
+               'nearby_stations': nsl,
+               'data': p.get_climate_data().get_data(),
+               'koppentype': climatetype,
+               'chinesetype': koppen2chinese.get(climatetype)
+           }, {'Access-Control-Allow-Origin': '*'}
