@@ -294,6 +294,8 @@ class Station:
         :return: the climate data in ClimateData class
         """
         data = get_to_json("https://api.meteostat.net/v2/stations/climate", params={"station": self.__id})
+        if not data['data']:
+            return self.__place.get_climate_data()
         return ClimateData(data['data'])
 
     def get_id(self):
