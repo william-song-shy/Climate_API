@@ -9,12 +9,17 @@ def get_to_json(url, params={}):
     :param params: params
     :return: the json response in dict
     """
-    return requests.get(url, headers={"x-api-key": "cEghsfXW7CG5W43dEzrvhjn3a8mZjkYm"}, params=params).json()
+    r = requests.get(url, headers={"x-api-key": "cEghsfXW7CG5W43dEzrvhjn3a8mZjkYm"}, params=params)
+    if r.status_code != 200:
+        raise Exception("return status" + r.status_code)
+    else:
+        return r.json()
 
 
 class ClimateData:
     """A class of climate data
     """
+
     def __init__(self, data):
         """
         A function to init the class
@@ -201,6 +206,7 @@ class Place:
     """
     A class of a place/point
     """
+
     def __init__(self, latitude, longitude, elevation):
         """
         Init the class
