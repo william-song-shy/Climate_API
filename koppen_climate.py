@@ -197,6 +197,7 @@ class ClimateData:
             # Ice cap (EF)
             else:
                 climate = 'EF'
+        return climate
 
     def get_data(self):
         return self.__data
