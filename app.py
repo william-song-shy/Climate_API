@@ -5,6 +5,13 @@ from koppen_climate import *
 
 app = APIFlask(__name__)
 
+@app.error_processor
+def my_error_handler(status_code, message, detail, headers):
+    return {
+        'status_code': status_code,
+        'message': message,
+        'detail': detail
+    }, status_code, {'Access-Control-Allow-Origin': '*'}
 
 class StationOut(Schema):
     id = String()
