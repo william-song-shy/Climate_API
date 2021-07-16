@@ -11,7 +11,7 @@ def get_to_json(url, params={}):
     """
     r = requests.get(url, headers={"x-api-key": "cEghsfXW7CG5W43dEzrvhjn3a8mZjkYm"}, params=params)
     if r.status_code != 200:
-        raise Exception("return status" + r.status_code)
+        raise Exception("return status" + str(r.status_code))
     else:
         return r.json()
 
