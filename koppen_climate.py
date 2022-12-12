@@ -9,9 +9,10 @@ def get_to_json(url, params={}):
     :param params: params
     :return: the json response in dict
     """
-    r = requests.get(url, headers={"x-api-key": "cEghsfXW7CG5W43dEzrvhjn3a8mZjkYm"}, params=params)
+    r = requests.get(
+        url, headers={"x-api-key": "cEghsfXW7CG5W43dEzrvhjn3a8mZjkYm"}, params=params)
     if r.status_code != 200:
-        raise Exception("return status" + r.status_code)
+        raise Exception("return status" + str(r.status_code))
     else:
         return r.json()
 
@@ -224,8 +225,8 @@ class Place:
         A function to get the climate data
         :return: the climate data in ClimateData class
         """
-        data = get_to_json("https://api.meteostat.net/v2/point/climate", params=
-        {"lat": self.__latitude, "lon": self.__longitude, "alt": self.__elevation})['data']
+        data = get_to_json("https://api.meteostat.net/v2/point/climate", params={
+                           "lat": self.__latitude, "lon": self.__longitude, "alt": self.__elevation})['data']
         return ClimateData(data)
 
     def get_nearby_stations(self):
@@ -284,7 +285,8 @@ class Station:
         self.__id = data['id']
         self.__name = data['name'].get('en')
         self.__country = data['country']
-        self.__place = Place(float(data["latitude"]), float(data["longitude"]), int(data["elevation"]))  # 经度纬度海拔
+        self.__place = Place(float(data["latitude"]), float(
+            data["longitude"]), int(data["elevation"]))  # 经度纬度海拔
 
     def set_by_id(self, ida):
         """
@@ -292,7 +294,8 @@ class Station:
         :param ida: meteostat id
         :return: noting
         """
-        data = get_to_json("https://api.meteostat.net/v2/stations/meta?id={}".format(ida))['data']
+        data = get_to_json(
+            "https://api.meteostat.net/v2/stations/meta?id={}".format(ida))['data']
         self.set_by_data(data)
 
     def get_climate_data(self):
@@ -300,7 +303,8 @@ class Station:
         Get the climate data
         :return: the climate data in ClimateData class
         """
-        data = get_to_json("https://api.meteostat.net/v2/stations/climate", params={"station": self.__id})
+        data = get_to_json(
+            "https://api.meteostat.net/v2/stations/climate", params={"station": self.__id})
         if not data['data']:
             return self.__place.get_climate_data()
         return ClimateData(data['data'])
