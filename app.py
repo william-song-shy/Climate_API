@@ -86,7 +86,7 @@ def FindPlace(data):
     Find a place (city,country,village etc.) by the name given.
     This API returns and accepts the name both in Chinese and English
     """
-    return mapbox_geocoding.search(data['name'], data['limit'])
+    return mapbox_geocoding.search(data['name'], data['limit']), {'Access-Control-Allow-Origin': '*'}
 
 
 @app.get('/station/find')
