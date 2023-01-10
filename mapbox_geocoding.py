@@ -22,6 +22,19 @@ def search(query, limits=5):
     } for i in r.get('features')]
     return res
 
+def reverse (lat,lon):
+    params={
+        "language": "zh-Hans,en",
+        "worldview": "cn",
+        "access_token": "pk.eyJ1Ijoic29uZ2hvbmd5aSIsImEiOiJja25jdDdjZG4xM25iMnVvb2NjbDl3YjMwIn0.PJZgJQmBgR_g-vsSD7uKFA"
+    }
+    url = endpoint+str(lon)+","+str(lat)+".json"
+    r = requests.get(url, params=params)
+    r = r.json()
+    if len(r['features']) == 0:
+        return None
+    return r['features'][0]
 
 if __name__ == "__main__":
-    print(search("贝尼迈拉勒"))
+    # print(search("贝尼迈拉勒"))
+    print(reverse(39.9042,116.4074))

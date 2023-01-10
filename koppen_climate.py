@@ -1,5 +1,6 @@
 import numpy as np
 import requests
+import mapbox_geocoding
 
 
 def get_to_json(url, params={}):
@@ -250,14 +251,11 @@ class Place:
         Get the country of the place
         :return: Alpha-2 code of the country (ISO 3166)
         """
-        data = requests.get(
-            "https://nominatim.openstreetmap.org/reverse?format=json&lat={}&lon={}&zom=18&addressdetails=1".format(
-                self.__latitude, self.__longitude
-            )
-        ).json()
-        if data.get('error'):
+        data=mapbox_geocoding.reverse(lat=self.__latitude, lon=self.__longitude)
+        if data is None:
             return None
-        return data.get('address').get('country_code')
+        data=data.get('context')[-1]
+        return data.get('short_code')
 
     def __repr__(self):
         return "({},{},{})".format(self.__latitude, self.__longitude, self.__elevation)
