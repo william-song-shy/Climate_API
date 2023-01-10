@@ -2,8 +2,10 @@ from apiflask import APIFlask, Schema, input, output
 from apiflask.fields import String, Integer, Float, Dict, List
 from apiflask.validators import Length, Range
 from koppen_climate import *
+import mapbox_geocoding
 
 app = APIFlask(__name__)
+
 
 @app.error_processor
 def my_error_handler(status_code, message, detail, headers):
@@ -12,6 +14,7 @@ def my_error_handler(status_code, message, detail, headers):
         'message': message,
         'detail': detail
     }, status_code, {'Access-Control-Allow-Origin': '*'}
+
 
 class StationOut(Schema):
     id = String()
@@ -28,6 +31,19 @@ class StationFindIn(Schema):
 
 class StationIn(Schema):
     id = String(required=True)
+
+
+class PlaceIn (Schema):
+    name = String(required=True, validate=Length(1, 80))
+    limit = Integer(required=False, missing=5, validate=Range(1, 15))
+
+
+class PlaceOut (Schema):
+    zh_name = String()
+    en_name = String()
+    lat = Float()
+    lon = Float()
+    bbox = List(Float())
 
 
 class StationandClimateOut(Schema):
@@ -60,6 +76,17 @@ def main():
 
     """
     return {"about": "See /redoc to see how to use this API"}
+
+
+@app.get("/place/find")
+@input(PlaceIn, location="query")
+@output(PlaceOut(many=True))
+def FindPlace(data):
+    """Find a place
+    Find a place (city,country,village etc.) by the name given.
+    This API returns and accepts the name both in Chinese and English
+    """
+    return mapbox_geocoding.search(data['name'], data['limit'])
 
 
 @app.get('/station/find')
@@ -128,15 +155,15 @@ def StationClimate(data):
         'EF': "冰原"
     }
     return {
-               'id': station.get_id(),
-               'name': station.get_name(),
-               'country': station.get_country(),
-               'lat': station.get_place().get_lat(),
-               'lon': station.get_place().get_lon(),
-               'data': station.get_climate_data().get_data(),
-               'koppentype': climatetype,
-               'chinesetype': koppen2chinese.get(climatetype)
-           }, {'Access-Control-Allow-Origin': '*'}
+        'id': station.get_id(),
+        'name': station.get_name(),
+        'country': station.get_country(),
+        'lat': station.get_place().get_lat(),
+        'lon': station.get_place().get_lon(),
+        'data': station.get_climate_data().get_data(),
+        'koppentype': climatetype,
+        'chinesetype': koppen2chinese.get(climatetype)
+    }, {'Access-Control-Allow-Origin': '*'}
 
 
 @app.get('/point/climate')
@@ -184,9 +211,9 @@ def PointClimate(data):
             nsl.append({'id': i.get_id(), 'country': i.get_country(), 'lat': i.get_place().get_lat(),
                         'lon': i.get_place().get_lon(), 'name': i.get_name()})
     return {
-               'country': p.get_country(),
-               'nearby_stations': nsl,
-               'data': p.get_climate_data().get_data(),
-               'koppentype': climatetype,
-               'chinesetype': koppen2chinese.get(climatetype)
-           }, {'Access-Control-Allow-Origin': '*'}
+        'country': p.get_country(),
+        'nearby_stations': nsl,
+        'data': p.get_climate_data().get_data(),
+        'koppentype': climatetype,
+        'chinesetype': koppen2chinese.get(climatetype)
+    }, {'Access-Control-Allow-Origin': '*'}
