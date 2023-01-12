@@ -22,12 +22,13 @@ class ClimateData:
     """A class of climate data
     """
 
-    def __init__(self, data):
+    def __init__(self, data, meta):
         """
         A function to init the class
         :param data:the data of the climate
         """
         self.__data = data
+        self.__meta = meta
 
     def get_koppen(self):
         """Get the climate type
@@ -204,6 +205,9 @@ class ClimateData:
     def get_data(self):
         return self.__data
 
+    def get_meta(self):
+        return self.__meta
+
 
 class Place:
     """
@@ -226,9 +230,11 @@ class Place:
         A function to get the climate data
         :return: the climate data in ClimateData class
         """
-        data = get_to_json("https://api.meteostat.net/v2/point/climate", params={
-                           "lat": self.__latitude, "lon": self.__longitude, "alt": self.__elevation})['data']
-        return ClimateData(data)
+        r = get_to_json("https://api.meteostat.net/v2/point/climate", params={
+            "lat": self.__latitude, "lon": self.__longitude, "alt": self.__elevation})
+        data = r['data']
+        meta = r['mata']
+        return ClimateData(data, meta)
 
     def get_nearby_stations(self):
         """The function to get nearby stations
@@ -251,10 +257,11 @@ class Place:
         Get the country of the place
         :return: Alpha-2 code of the country (ISO 3166)
         """
-        data=mapbox_geocoding.reverse(lat=self.__latitude, lon=self.__longitude)
+        data = mapbox_geocoding.reverse(
+            lat=self.__latitude, lon=self.__longitude)
         if data is None:
             return None
-        data=data.get('context')[-1]
+        data = data.get('context')[-1]
         return data.get('short_code')
 
     def __repr__(self):
@@ -305,7 +312,7 @@ class Station:
             "https://api.meteostat.net/v2/stations/climate", params={"station": self.__id})
         if not data['data']:
             return self.__place.get_climate_data()
-        return ClimateData(data['data'])
+        return ClimateData(data['data'], data['meta'])
 
     def get_id(self):
         return self.__id

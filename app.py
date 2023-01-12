@@ -121,7 +121,8 @@ def StationClimate(data):
     """
     station = Station()
     station.set_by_id(data['id'])
-    climatetype = station.get_climate_data().get_koppen()
+    data=station.get_climate_data()
+    climatetype = data.get_koppen()
     koppen2chinese = {
         'Af': "热带雨林",
         'Am': "热带季风",
@@ -160,9 +161,10 @@ def StationClimate(data):
         'country': station.get_country(),
         'lat': station.get_place().get_lat(),
         'lon': station.get_place().get_lon(),
-        'data': station.get_climate_data().get_data(),
+        'data': data.get_data(),
         'koppentype': climatetype,
-        'chinesetype': koppen2chinese.get(climatetype)
+        'chinesetype': koppen2chinese.get(climatetype),
+        'source': data.get_meta().get('source')
     }, {'Access-Control-Allow-Origin': '*'}
 
 
@@ -171,7 +173,8 @@ def StationClimate(data):
 @output(PointandClimateOut)
 def PointClimate(data):
     p = Place(data['lat'], data['lon'], 0)
-    climatetype = p.get_climate_data().get_koppen()
+    data=p.get_climate_data()
+    climatetype =data.get_koppen()
     koppen2chinese = {
         'Af': "热带雨林",
         'Am': "热带季风",
@@ -213,7 +216,8 @@ def PointClimate(data):
     return {
         'country': p.get_country(),
         'nearby_stations': nsl,
-        'data': p.get_climate_data().get_data(),
+        'data': data.get_data(),
         'koppentype': climatetype,
-        'chinesetype': koppen2chinese.get(climatetype)
+        'chinesetype': koppen2chinese.get(climatetype),
+        'source': data.get_meta().get('source')
     }, {'Access-Control-Allow-Origin': '*'}
