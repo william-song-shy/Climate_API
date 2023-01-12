@@ -233,7 +233,7 @@ class Place:
         r = get_to_json("https://api.meteostat.net/v2/point/climate", params={
             "lat": self.__latitude, "lon": self.__longitude, "alt": self.__elevation})
         data = r['data']
-        meta = r['mata']
+        meta = r['meta']
         return ClimateData(data, meta)
 
     def get_nearby_stations(self):

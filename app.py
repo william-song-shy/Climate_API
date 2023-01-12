@@ -55,6 +55,7 @@ class StationandClimateOut(Schema):
     data = List(Dict())
     koppentype = String()
     chinesetype = String()
+    source = String()
 
 
 class PointIn(Schema):
@@ -68,6 +69,7 @@ class PointandClimateOut(Schema):
     data = List(Dict())
     koppentype = String()
     chinesetype = String()
+    source = String()
 
 
 @app.get('/')
