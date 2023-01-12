@@ -166,7 +166,7 @@ def StationClimate(data):
         'data': data.get_data(),
         'koppentype': climatetype,
         'chinesetype': koppen2chinese.get(climatetype),
-        'source': data.get_meta().get('source')
+        'source': data.get_meta().get('source')+" from {} to {}".format(data.get_meta().get('start'), data.get_meta().get('end'))
     }, {'Access-Control-Allow-Origin': '*'}
 
 
@@ -221,5 +221,5 @@ def PointClimate(data):
         'data': data.get_data(),
         'koppentype': climatetype,
         'chinesetype': koppen2chinese.get(climatetype),
-        'source': data.get_meta().get('source')
+        'source': data.get_meta().get('source')+ " from {} to {}".format(data.get_meta().get('start'), data.get_meta().get('end'))
     }, {'Access-Control-Allow-Origin': '*'}
