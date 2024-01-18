@@ -43,6 +43,8 @@ def StationClimate():
     id_ = request.args.get("id")
     data = Normals(id_, 1991, 2020)
     data = data.fetch()
+    if data.empty:
+        return jsonify({"error": "No data"}), {"Access-Control-Allow-Origin": "*"}
     meta = get_station_meta(id_)
     climatetype = data_to_koppen(data)
     data = data.to_dict(orient="records")
@@ -71,6 +73,8 @@ def PointClimate():
     stations = stations.fetch(5)
     data = Normals(Point(lat, lon), 1991, 2020)
     data = data.fetch()
+    if data.empty:
+        return jsonify({"error": "No data"}), {"Access-Control-Allow-Origin": "*"}
     climatetype = data_to_koppen(data)
     data = data.to_dict(orient="records")
     data = [{k: None if pd.isna(v) else v for k, v in i.items()} for i in data]
