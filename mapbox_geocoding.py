@@ -35,6 +35,13 @@ def reverse (lat,lon):
         return None
     return r['features'][0]
 
+def get_country (lat,lon):
+    data = reverse(lat,lon)
+    if data is None:
+        return None
+    return data['context'][-1]['short_code']
+
 if __name__ == "__main__":
     # print(search("贝尼迈拉勒"))
-    print(reverse(39.9042,116.4074))
+    print(reverse(39.9042,-74.197958))
+    print(get_country(39.953736,-74.197958))

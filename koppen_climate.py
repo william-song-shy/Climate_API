@@ -1,6 +1,7 @@
 import numpy as np
 import requests
 import mapbox_geocoding
+from pandas import DataFrame
 
 koppen2chinese = {
     "Af": "热带雨林",
@@ -52,14 +53,9 @@ def get_to_json(url, params={}):
         return r.json()
 
 
-def data_to_koppen(data: dict):
-    avgtemp = list()
-    precip = list()
-    for i in data:
-        avgtemp.append(i["tavg"])
-        precip.append(i["prcp"])
-    avgtemp = np.array(avgtemp)
-    precip = np.array(precip)
+def data_to_koppen(data: DataFrame):
+    avgtemp = np.array(data["tavg"].tolist())
+    precip = np.array(data["prcp"].tolist())
     totalprecip = sum(precip)
     if min(avgtemp) >= 18.0:
         if min(precip) >= 60.0:
@@ -210,123 +206,6 @@ def data_to_koppen(data: dict):
             return "EF"
 
 
-class Place:
-    """
-    A class of a place/point
-    """
-
-    def __init__(self, latitude, longitude, elevation):
-        """
-        Init the class
-        :param latitude: the latitude of the place
-        :param longitude: the longitude of the place
-        :param elevation: the elevation of the place
-        """
-        self.latitude = latitude
-        self.longitude = longitude
-        self.elevation = elevation
-
-    def get_climate_data(self):
-        """
-        A function to get the climate data
-        :return: the climate data in ClimateData class
-        """
-        r = get_to_json(
-            "https://api.meteostat.net/v2/point/climate",
-            params={
-                "lat": self.latitude,
-                "lon": self.longitude,
-                "alt": self.elevation,
-            },
-        )
-        data = r["data"]
-        meta = r["meta"]
-        return data, meta
-
-    def get_nearby_stations(self):
-        """The function to get nearby stations
-        :return: the list of nearby stations in Station class
-        """
-        data = get_to_json(
-            "https://api.meteostat.net/v2/stations/nearby",
-            params={"lat": self.latitude, "lon": self.longitude},
-        )["data"]
-        ans = list()
-        if not data:
-            return None
-        for i in data:
-            id = i["id"]
-            temp = Station()
-            temp.set_by_id(id)
-            ans.append(temp)
-        return ans
-
-    def get_country(self):
-        """
-        Get the country of the place
-        :return: Alpha-2 code of the country (ISO 3166)
-        """
-        data = mapbox_geocoding.reverse(lat=self.latitude, lon=self.longitude)
-        if data is None:
-            return None
-        data = data.get("context")[-1]
-        return data.get("short_code")
-
-
-class Station:
-    def __init__(self):
-        pass
-
-    def set_by_data(self, data):
-        """
-        Set the station with data
-        :param data: the data
-        :return: noting
-        """
-        self.__id = data["id"]
-        self.__name = data["name"].get("en")
-        self.__country = data["country"]
-        self.__place = Place(
-            float(data["latitude"]), float(data["longitude"]), int(data["elevation"])
-        )  # 经度纬度海拔
-
-    def set_by_id(self, ida):
-        """
-        Set the station by meteostat id
-        :param ida: meteostat id
-        :return: noting
-        """
-        data = get_to_json(
-            "https://api.meteostat.net/v2/stations/meta?id={}".format(ida)
-        )["data"]
-        self.set_by_data(data)
-
-    def get_climate_data(self):
-        """
-        Get the climate data
-        :return: the climate data in ClimateData class
-        """
-        data = get_to_json(
-            "https://api.meteostat.net/v2/stations/climate",
-            params={"station": self.__id},
-        )
-        if not data["data"]:
-            return self.__place.get_climate_data()
-        return data["data"], data["meta"]
-
-    def get_id(self):
-        return self.__id
-
-    def get_name(self):
-        return self.__name
-
-    def get_country(self):
-        return self.__country
-
-    def get_place(self):
-        return self.__place
-
-
 def search_station(query, length=10):
     """
     Search station by the name
@@ -339,9 +218,16 @@ def search_station(query, length=10):
         "https://api.meteostat.net/v2/stations/search",
         params={"query": query, "limit": length},
     )["data"]
-    ans = list()
-    for i in data:
-        temp = Station()
-        temp.set_by_data(i)
-        ans.append(temp)
-    return ans
+    return data
+
+def get_station_meta (id):
+    """
+    Get the meta data of a station
+    :param id: the id of the station
+    :return: the meta data
+    """
+    data = get_to_json(
+        "https://api.meteostat.net/v2/stations/meta",
+        params={"id": id},
+    )["data"]
+    return data
